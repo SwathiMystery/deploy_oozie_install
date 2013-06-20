@@ -1,0 +1,43 @@
+# hosts are comma seperated quoted hosts
+# [TO-DO] 
+# please replace with the public IP address of namenode and datanode
+# (based on no. of nodes) respectively
+role :hadoop_namenode,  "xxx.xxx.xxx.xxx",
+role :hadoop_datanodes, "xxx.xxx.xxx.xxx",  "xxx.xxx.xxx.xxx",  "xxx.xxx.xxx.xxx",  "xxx.xxx.xxx.xxx"
+set :user, "incentica"
+#set :use_sudo, true
+
+## enable forwarding with the ssh keys in your machine [hadoopkey]
+set :ssh_options, {:forward_agent => true}
+# [TO-DO] 
+# Please set the key required to make the ssh possible in the cluster
+ssh_options[:keys] = ["~/.ssh/hadoopkey"]
+
+## Oozie installation
+desc "Setup / configure oozie on the namenode"
+task :setup_oozie, :roles => :hadoop_namenode do
+ run "sudo apt-get -y install oozie oozie-client"
+ run "sudo apt-get -y install mysql-server-5.1"
+ run "mysql -u root -e \"create database IF NOT EXISTS oozie;grant all privileges on oozie.* to 'oozie'@'localhost' identified by 'oozie';grant all pr
+ivileges on oozie.* to 'oozie'@'%' identified by 'oozie';\""
+ run "sudo rm -rf /etc/oozie/conf/oozie-site.xml"
+ upload "../resources/oozie-site.xml","/tmp/oozie-site.xml"
+ run "sudo mv /tmp/oozie-site.xml /etc/oozie/conf/oozie-site.xml"
+ upload "../resources/mysql-connector-java-5.1.24.tar.gz","/tmp/mysql-connector-java-5.1.24.tar.gz" 
+ run "cd /tmp; tar -xzvf mysql-connector-java-5.1.24.tar.gz"
+ run "cd /tmp; sudo cp mysql-connector-java-5.1.24/mysql-connector-java-5.1.24-bin.jar /var/lib/oozie/"
+ run "sudo -u oozie /usr/lib/oozie/bin/ooziedb.sh create -run"
+ upload "../resources/ext-2.2.zip","/tmp/ext-2.2.zip"
+ run "sudo mv /tmp/ext-2.2.zip /home/users/incentica"
+ run "sudo apt-get install unzip"
+ run "unzip ext-2.2.zip"
+ run "sudo cp -rf ext-2.2 /var/lib/oozie/"
+ run "sudo chown -R oozie:oozie /var/lib/oozie/"
+ run "sudo -u hdfs hadoop fs -mkdir  /user/$USER"
+ run "sudo -u hdfs hadoop fs -chown oozie:oozie /user/$USER"
+ run "sudo ln -s /usr/lib/hadoop/lib/jets3t-0.6.1.jar /var/lib/oozie/"
+ run "sudo ln -s /usr/lib/hadoop/lib/commons-httpclient-3.1.jar /var/lib/oozie/"
+ run "sudo chown -R oozie:oozie /var/lib/oozie"
+ run "sudo service oozie start"
+ run "export OOZIE_URL=http://localhost:11000/oozie"
+end
