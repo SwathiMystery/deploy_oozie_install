@@ -17,8 +17,6 @@ and tested on CDH4 MRv1 with AWS EC2 instances.
 
 Oozie operations
 ----------------
-
-
-
-
-
+- $ cd deploy
+- Edit the [TO-DO] in capfile with right IP addresses and the key file and save.
+- $ cap setup_oozie
