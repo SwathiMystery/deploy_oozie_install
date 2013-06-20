@@ -28,7 +28,9 @@
 # (based on no. of nodes) respectively
 role :hadoop_namenode,  "xxx.xxx.xxx.xxx",
 role :hadoop_datanodes, "xxx.xxx.xxx.xxx",  "xxx.xxx.xxx.xxx",  "xxx.xxx.xxx.xxx",  "xxx.xxx.xxx.xxx"
-set :user, "incentica"
+## [TO-DO]
+## Please set the user
+set :user, "ubuntu"
 #set :use_sudo, true
 
 ## enable forwarding with the ssh keys in your machine [hadoopkey]
@@ -52,7 +54,7 @@ ivileges on oozie.* to 'oozie'@'%' identified by 'oozie';\""
  run "cd /tmp; sudo cp mysql-connector-java-5.1.24/mysql-connector-java-5.1.24-bin.jar /var/lib/oozie/"
  run "sudo -u oozie /usr/lib/oozie/bin/ooziedb.sh create -run"
  upload "../resources/ext-2.2.zip","/tmp/ext-2.2.zip"
- run "sudo mv /tmp/ext-2.2.zip /home/users/incentica"
+ run "sudo mv /tmp/ext-2.2.zip /home/users/ubuntu"
  run "sudo apt-get install unzip"
  run "unzip ext-2.2.zip"
  run "sudo cp -rf ext-2.2 /var/lib/oozie/"
